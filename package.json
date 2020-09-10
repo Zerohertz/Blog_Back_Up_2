@@ -12,14 +12,26 @@
     "version": ""
   },
   "dependencies": {
-    "hexo": "^5.0.0",
+    "@heowc/hexo-tag-gdemo": "^0.12.0",
+    "hexo": "^5.1.1",
+    "hexo-auto-canonical": "^0.1.1",
+    "hexo-autonofollow": "^1.0.1",
+    "hexo-cli": "^4.2.0",
+    "hexo-deployer-git": "^2.1.0",
     "hexo-generator-archive": "^1.0.0",
     "hexo-generator-category": "^1.0.0",
+    "hexo-generator-feed": "^3.0.0",
     "hexo-generator-index": "^2.0.0",
+    "hexo-generator-redirect": "^1.3.1",
+    "hexo-generator-robotstxt": "^0.2.0",
+    "hexo-generator-search": "^2.4.0",
+    "hexo-generator-seo-friendly-sitemap": "0.0.25",
     "hexo-generator-tag": "^1.0.0",
+    "hexo-related-popular-posts": "^5.0.1",
     "hexo-renderer-ejs": "^1.0.0",
     "hexo-renderer-marked": "^3.0.0",
     "hexo-renderer-stylus": "^2.0.0",
-    "hexo-server": "^2.0.0"
+    "hexo-server": "^2.0.0",
+    "hexo-symbols-count-time": "^0.7.1"
   }
 }
