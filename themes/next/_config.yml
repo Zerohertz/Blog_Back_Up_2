@@ -833,10 +833,10 @@ nprogress:
 # Canvas ribbon
 # For more information: https://github.com/hustcc/ribbon.js
 canvas_ribbon:
-  enable: false
-  size: 200 # The width of the ribbon
-  alpha: 0.6 # The transparency of the ribbon
-  zIndex: -1 # The display level of the ribbon
+  enable: true
+  size: 150 # The width of the ribbon
+  alpha: 0.8 # The transparency of the ribbon
+  zIndex: -2 # The display level of the ribbon
 
 
 #! ==============================================================
