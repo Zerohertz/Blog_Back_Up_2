@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="{{ config.language }}">
 <head>
+  <meta property="og:image" content="https://user-images.githubusercontent.com/42334717/89857466-2301e600-dbd7-11ea-9f52-f375b8a3d435.jpg" />
+  <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
+  <script type="text/javascript">
+  if(!wcs_add) var wcs_add = {};
+  wcs_add["wa"] = "7e701a42aec008";
+  if(window.wcs) {
+      wcs_do();
+  }
+  </script>
   {{ partial('_partials/head/head.njk', {}, {cache: theme.cache.enable}) }}
   {% include '_partials/head/head-unique.njk' %}
   <title>{% block title %}{% endblock %}</title>
