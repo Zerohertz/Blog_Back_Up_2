@@ -9,7 +9,7 @@
     "server": "hexo server"
   },
   "hexo": {
-    "version": ""
+    "version": "5.1.1"
   },
   "dependencies": {
     "@heowc/hexo-tag-gdemo": "^0.12.0",
