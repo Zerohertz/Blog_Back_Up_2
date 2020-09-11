@@ -67,7 +67,7 @@ custom_logo: https://user-images.githubusercontent.com/42334717/76139363-5c67800
 # CC licenses are available in 39 languages, you can find the specific and correct abbreviation you need on https://creativecommons.org
 creative_commons:
   license: by-nc-sa
-  sidebar: true
+  sidebar: false
   post: true
   language:
 
