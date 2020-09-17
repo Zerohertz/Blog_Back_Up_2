@@ -433,7 +433,9 @@ except:
 
 ***
 
-# Undersampling
+# R
+
+## Undersampling
 
 ~~~R undersampling.R
 setwd("/Users/zerohertz/MATLAB/Obstructive Sleep Apnea/")
@@ -454,6 +456,20 @@ s4=del40[sample(nrow(del40),4421,replace=FALSE),]
 sleep=rbind(s1,s2,s3,s4)
 
 write.table(sleep,file="sl1.csv",sep=",",row.names=F,col.names=T)
+~~~
+
+## Make Label Data
+
+~~~R MakeLabelData
+i = 1
+
+while(i <= length(raw[,1])){
+	time=raw[i,1]
+	ti=time%/%30+1
+	raw[i,6]=lab[ti,1]
+	i=i+1
+}
+write.table(raw,file="label.csv",sep=",",row.names=F,col.names=F)
 ~~~
 
 ***

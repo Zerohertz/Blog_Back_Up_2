@@ -334,3 +334,78 @@ mathjax: true
 
 # Automotive Development Process
 
+## Stages of Product Development
+
+1. Idea Generation
+2. Idea Screening
+3. Concept Development
+4. Market Strategy
+5. Feasibility Analysis / Study
+6. Product Design
+7. Test Marketing
+8. Market Entry
+
+## NPD(New Product Development) Process
+
+1. Product Planning(상품 / 제품기획)
+   + Idea generation
+   + Idea screening
+2. Design Concept Build(개념설계)
+   + Concept development and testing
+3. Product Development(제품개발 / 상세설계)
+   + Product development
+4. Manufacturing Preparation(생산기술검증 / 양산준비)
+
+## Needs & Solutions
+
++ Needs
+   + Buyer Wants
+     + Quality
+     + Price
+     + Innovation
+     + Style
+   + Management Wants
+     + Customer Satisfaction
+     + Market Share
+     + Maximize Profit
+   + Development Needs
+     + Improve Quality
+     + Cost Down
+     + Reduce Time
+ + Solutions
+   + Technical Innovation
+     + New Technology
+   + Process Innovation
+     + Digital Development
+
+## Necessity of the Process
+
++ Increase Efficiency
++ Reduce Time & Cost
++ Improve Product Quality
++ Systematic Approach
+
+> **Better Product, Faster into the market** to survive the competition
+
+## Goals and Requirements
+
++ 개발 5대 목표
+  + 원가
+    + 재료비 : 공용화(Cost Down by Volume), 저가 재료, 최적화
+    + 생산비 : 혼류, 최적화
+    + 개발비 : 플랫폼 성능공용화, 시스템 & 프로세스
+  + 중량 : 경량재료, 최적화
+  + 기능 : 작동, 편의
+  + 성능 : 법규, 상품성
+  + 생산성 : 성형, 조립, 최적화
++ 5대 성능
+  + 강성 및 내구
+  + 충돌 및 안정
+  + R & H(Ride & Handling)
+  + 소음 및 진동(NV, Noise & Vibration)
+  + 얄유동(공력, 냉각공조)
+  + Etc.
+
+***
+
+#
