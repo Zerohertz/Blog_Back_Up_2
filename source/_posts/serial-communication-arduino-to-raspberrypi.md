@@ -2,11 +2,9 @@
 title: Serial Communication(Arduino to RaspberryPi)
 date: 2020-08-18 13:24:03
 categories:
-- C, C++
-- Arduino
+- RaspberryPi
 tags:
 - Arduino
-- C, C++
 - RaspberryPi
 - Python
 ---
