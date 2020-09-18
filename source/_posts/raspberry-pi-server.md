@@ -69,7 +69,16 @@ network={
 
 ![IP_Config](https://user-images.githubusercontent.com/42334717/93595386-a098ed00-f9f2-11ea-9600-c2e1231ae1a0.png)
 
-> 이후 공유기 자체의 IP를 고정 IP로 설정을 바꿔준다. 또한 포트포워딩을 통해 내부 포트는 22로 외부 포트는 자유로 설정하고 IP는 위에서 라즈베리 파이에 할당한 IP를 기입한다.
+> 이후 공유기 자체의 IP를 고정 IP로 설정을 바꿔준다. 또한 포트포워딩을 통해 내부 포트는 22로, 외부 포트는 자유로 설정하고 IP는 위에서 라즈베리 파이에 할당한 IP를 기입한다.
+
+***
+
+# 외부에서 ssh 접속
 
 {% gdemo_terminal 'ssh pi@xxx.xxx.xxx.xxx(고정IP) -p(외부 포트)' '30px' 'zerohertz@zerohertz: ~' '300' 'zerohertz@zerohertz\ ~\ ' 'zerohertz2' 'applescript' %}
 {% endgdemo_terminal %}
+
+<br/>
+<br/>
+
+> 만약 외부 포트를 22로 할당해주었다면, -p를 제외하고 실행해도 무방하다.
