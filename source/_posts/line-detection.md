@@ -5,6 +5,7 @@ categories:
 - C, C++
 tags:
 - C, C++
+- RaspberryPi
 thumbnail: https://user-images.githubusercontent.com/42334717/44299945-d530ab00-a339-11e8-83bf-33493445441d.png
 ---
 ````C++
