@@ -386,7 +386,7 @@ bookmark:
   color: "#800a0a"
   # If auto, save the reading progress when closing the page or clicking the bookmark-icon.
   # If manual, only save it by clicking the bookmark-icon.
-  save: false
+  save: manual
 
 # `Follow me on GitHub` banner in the top-right corner.
 github_banner:
