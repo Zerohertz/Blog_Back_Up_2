@@ -467,7 +467,22 @@ while(i <= length(raw[,1])){
 	time=raw[i,1]
 	ti=time%/%30+1
 	raw[i,6]=lab[ti,1]
-	i=i+1
+  if(lab[ti,1]=='W'){
+    raw[i,7]=0
+  }
+  else if(lab[ti,1]=='N1'){
+    raw[i,7]=10
+  }
+  else if(lab[ti,1]=='N2'){
+    raw[i,7]=20
+  }
+  else if(lab[ti,1]=='N3'){
+    raw[i,7]=30
+  }
+	else if(lab[ti,1]=='R'){
+    raw[i,7]=40
+  }
+  i=i+1
 }
 write.table(raw,file="label.csv",sep=",",row.names=F,col.names=F)
 ~~~
