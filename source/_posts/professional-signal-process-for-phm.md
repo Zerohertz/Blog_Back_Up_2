@@ -16,7 +16,7 @@ mathjax: true
 
 ## PHM?
 
-> Prognostic and Health Management(건전성 예측 및 관리)
+> Prognostics and Health Management(건전성 예측 및 관리)
 
 ### 특징
 

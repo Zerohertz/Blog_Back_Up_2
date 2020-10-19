@@ -26,7 +26,7 @@ comments: false
 
 # Research Interests
 
-+ PHM(Prognostic and Health Management)
++ PHM(Prognostics and Health Management)
 + Smart Data(Feature Extraction)
 + ML(Machine Learning)
 + DNN(Deep Neural Network)
