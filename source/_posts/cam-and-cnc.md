@@ -499,3 +499,28 @@ mathjax: true
   + 주조와 같은 공정을 이용하여 최종 형상과 비슷한 소재
   + From near shape, cutting process can be saved
 
+### Round endmill에 의한 가공
+
++ Ball endmill
+  + 절삭성 불량(Cutting is not good at the center)
++ Round endmill
+  + 밑날이 없음(No end cutting edge)
+  + 주로 R부 가공(Mainly cutting by R part)
+  + 상향절삭이 보장(CL 데이터 산출)
+
+## 가공계획(Cutter path planning) 및 영역가공
+
++ Parametric method
+  + Iso parametric curve를 따라 가공($u=u_1$ or $v=v_1$)
+  + 공구접촉점(CC point) 기준
+  + 수치적 계산 간단(사각형 곡면 가공시 적합)
+  + 보통 곡률이 큰 방향 가공
++ Cartesian method
+  + 매개변수형 곡면시 수직평면으로 절단 후 평면 안에서 가공
+  + CC-Cartesian : 공구의 접촉점(CC point)을 기준으로 가공
+  + CL-Cartesian : 공구상의 기준점(CL point)을 기준으로 가공
+  + 수치적 계산 복잡
+  + 비 매개변수형 곡면시 절단 불필요
+  + 불규칙한 형상에 적합
+
+## 직선보간 길이 계산
