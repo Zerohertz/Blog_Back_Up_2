@@ -20,7 +20,7 @@ mathjax: true
 
 ### 특징
 
-+ 최근 산업규모가 점차 커지며 기술 발전 - 시스템 운영에서 안전(Risk)와 비용(Cost)을 함께 고려
++ 최근 산업 규모가 점차 커지며 기술 발전 - 시스템 운영에서 안전(Risk)과 비용(Cost)을 함께 고려
 + 시스템의 결함(Fault)을 조기 감지(Early detection)
 + 발생한 결함의 종류와 심각도 진단(Diagnosis)
 + 고장 발생 시점 사전 예지(Prognosis)
