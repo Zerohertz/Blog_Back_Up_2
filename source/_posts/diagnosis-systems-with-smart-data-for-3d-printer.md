@@ -263,5 +263,3 @@ mathjax: true
 
 [20200313 SiM Lab. Meeting Presentation - 오효근.pdf](https://github.com/Zerohertz/Zerohertz.github.io/files/4355057/20200313.SiM.Lab.Meeting.Presentation.-.pdf)
 [20200320 SiM Lab. Meeting Presentation - 오효근.pdf](https://github.com/Zerohertz/Zerohertz.github.io/files/4355054/20200320.SiM.Lab.Meeting.Presentation.-.pdf)
-
-***
