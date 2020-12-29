@@ -497,3 +497,130 @@ function dnf_num = dnf(c1, c2, al, be)
     dnf_num = 1/(al+be)*(al*(kurtosis(c1)/kurtosis(c2))+be*(sqrt(var(c1))/sqrt(var(c2))));
 end
 ~~~
+
+***
+
+# HRV(Heart Rate Variability)
+
+## Detecting R-R Interval
+
+~~~Matlab rr_interval.mat
+function [qrspeaks, locs, y] = rr_interval(time,ecg)
+t = time;
+wt = modwt(ecg, 5);
+wtrec = zeros(size(wt));
+wtrec(4:5, :) = wt(4:5, :);
+y = imodwt(wtrec , 'sym4');
+y = abs(y).^2;
+[qrspeaks, locs] = findpeaks(y, t, 'MinPeakHeight', 0.35, 'MinPeakDistance', 0.150); %time과 y에 대한 그래프를 해석 후 파라미터 결정
+end
+~~~
+
+> ECG
+
+<img width="672" alt="ECG" src="https://user-images.githubusercontent.com/42334717/103261452-fbc07f80-49e4-11eb-8181-4251df1a5af5.png">
+
+~~~Matlab
+>> load mit200
+>> plot(tm, ecgsig)
+~~~
+
+> R Peaks Localized by Wavelet Transform with Automatic Annotations
+
+<img width="1051" alt="R Peaks Localized by Wavelet Transform with Automatic Annotations" src="https://user-images.githubusercontent.com/42334717/103263042-11847380-49ea-11eb-8daa-b840f7f837a5.png">
+
+~~~Matlab
+>> [qr, lo, y] = rr_interval(tm, ecgsig);
+>> plot(tm,y)
+>> hold on
+>> plot(lo,qr,'ro')
+>> plot(tm(ann),y(ann),'k*')
+>> grid on
+~~~
+
+## Make HRV Data from R-R Interval
+
+~~~Matlab MakeHRV.m
+function [time, val] = MakeHRV(locat)
+for num = (1:length(locat)-1)
+    val(num) = locat(num + 1) - locat(num);
+    time(num) = locat(num);
+end
+~~~
+
+> HRV
+
+![HRV](https://user-images.githubusercontent.com/42334717/103266138-4f859580-49f2-11eb-8ca9-ee74b18e45d7.jpg)
+
+***
+
+# Condition Indicators of HRV
+
+## Time Domain Analysis
+
+
+
+## Frequency Domain Analysis
+
+~~~Matlab freqHRVplot.m
+function [f, P1] = freqHRVplot(hrv, Length, SamplingTime)
+y=fft(hrv);
+SamplingRate = Length / SamplingTime;
+P2 = abs(y/Length);
+P1 = P2(1:Length/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+f = SamplingRate * (0:(Length/2))/Length;
+plot(f, P1)
+end
+~~~
+
+~~~Matlab freqHRVplot1.m
+function [f, P1] = freqHRVplot1(hrv, Length, SamplingTime)
+SamplingRate = Length / SamplingTime;
+NFFT = 2^(ceil(log2(length(hrv))));
+Y = fft(hrv, NFFT) / Length;
+f = SamplingRate / 2 * linspace(0, 1 ,NFFT / 2 + 1);
+P1 = 2*abs(Y(1:NFFT/2+1));
+plot(f, P1)
+end
+~~~
+
+
+~~~Matlab
+>> load mit200
+>> [qr, lo, y] = rr_interval(tm, ecgsig)
+>> [ti, hrv] = MakeHRV(lo)
+>> [f1, p1] = freqHRVplot(hrv, 40, 27.775)
+>> [f2, p2] = freqHRVplot1(hrv, 40, 27.775)
+>> [VLF, LF, HF] = freqHRVanalysis(f1, p1)
+
+VLF =
+
+    0.0485
+
+
+LF =
+
+    0.0244
+
+
+HF =
+
+    0.0373
+
+>> [VLF, LF, HF] = freqHRVanalysis(f2, p2)
+
+VLF =
+
+    0.4465
+
+
+LF =
+
+    0.1021
+
+
+HF =
+
+    0.0597
+~~~
