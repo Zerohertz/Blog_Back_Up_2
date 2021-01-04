@@ -510,7 +510,7 @@ t = time;
 wt = modwt(ecg, 5);
 wtrec = zeros(size(wt));
 wtrec(4:5, :) = wt(4:5, :);
-y = imodwt(wtrec , 'sym4');
+y = imodwt(wtrec, 'sym4');
 y = abs(y).^2;
 [qrspeaks, locs] = findpeaks(y, t, 'MinPeakHeight', 0.35, 'MinPeakDistance', 0.150); %time과 y에 대한 그래프를 해석 후 파라미터 결정
 end
@@ -531,10 +531,10 @@ end
 
 ~~~Matlab
 >> [qr, lo, y] = rr_interval(tm, ecgsig);
->> plot(tm,y)
+>> plot(tm, y)
 >> hold on
->> plot(lo,qr,'ro')
->> plot(tm(ann),y(ann),'k*')
+>> plot(lo, qr, 'ro')
+>> plot(tm(ann), y(ann), 'k*')
 >> grid on
 ~~~
 
@@ -556,42 +556,74 @@ end
 
 # Condition Indicators of HRV
 
+> Data 사용
+
+~~~Matlab
+wfdb2mat('FileName');
+[tm, ecg, Fs, labels] = rdmat('FileNamem');
+~~~
+
 ## Time Domain Analysis
 
 
 
 ## Frequency Domain Analysis
 
-~~~Matlab freqHRVplot.m
-function [f, P1] = freqHRVplot(hrv, Length, SamplingTime)
+~~~Matlab freqHRV.m
+function [f, P1] = freqHRV(hrv, Length, SamplingTime)
 y=fft(hrv);
 SamplingRate = Length / SamplingTime;
 P2 = abs(y/Length);
 P1 = P2(1:Length/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
 f = SamplingRate * (0:(Length/2))/Length;
-plot(f, P1)
 end
 ~~~
 
-~~~Matlab freqHRVplot1.m
-function [f, P1] = freqHRVplot1(hrv, Length, SamplingTime)
+~~~Matlab freqHRV1.m
+function [f, P1] = freqHRV1(hrv, Length, SamplingTime)
 SamplingRate = Length / SamplingTime;
 NFFT = 2^(ceil(log2(length(hrv))));
 Y = fft(hrv, NFFT) / Length;
-f = SamplingRate / 2 * linspace(0, 1 ,NFFT / 2 + 1);
+f = SamplingRate / 2 * linspace(0, 1, NFFT / 2 + 1);
 P1 = 2*abs(Y(1:NFFT/2+1));
-plot(f, P1)
 end
 ~~~
 
+~~~Matlab freqHRVanalysis.m
+function [VLF, LF, HF] = freqHRVanalysis(freq, amp)
+i = 1;
+j = 1;
+k = 1;
+VLF_amp(1) = 1;
+LF_amp(1) = 1;
+HF_amp(1) = 1;
+for num = (1:length(freq))
+    if 0.003 <= freq(num) && freq(num) < 0.05
+        %VLF_freq(i) = freq(num);
+        VLF_amp(i) = amp(num);
+        i = i + 1;
+    elseif 0.05 <= freq(num) && freq(num) < 0.15
+        %LF_freq(j) = freq(num);
+        LF_amp(j) = amp(num);
+        j = j + 1;
+    elseif 0.15 <= freq(num) && freq(num) <= 0.4
+        %HF_freq(k) = freq(num);
+        HF_amp(k) = amp(num);
+        k = k + 1;
+    end
+    VLF = mean(VLF_amp);
+    LF = mean(LF_amp);
+    HF = mean(HF_amp);    
+end
+~~~
 
 ~~~Matlab
 >> load mit200
 >> [qr, lo, y] = rr_interval(tm, ecgsig)
 >> [ti, hrv] = MakeHRV(lo)
->> [f1, p1] = freqHRVplot(hrv, 40, 27.775)
->> [f2, p2] = freqHRVplot1(hrv, 40, 27.775)
+>> [f1, p1] = freqHRV(hrv, 40, 27.775)
+>> [f2, p2] = freqHRV1(hrv, 40, 27.775)
 >> [VLF, LF, HF] = freqHRVanalysis(f1, p1)
 
 VLF =
@@ -623,4 +655,41 @@ LF =
 HF =
 
     0.0597
+~~~
+
+~~~Matlab windowHRV.m
+function [f, P] = windowHRV(time, ECG, SamplingRate, Winsize)
+%Sampling Rate(Hz)
+%Window size(Min)
+SamplingTime = Winsize * 60;
+Win = fix(SamplingRate * SamplingTime);
+num = fix(length(ECG) / Win);
+
+for N = (1:num)
+    Time_Arr(:, N) = time(Win * (N - 1) + 1:Win * N);
+    ECG_Arr(:, N) = ECG(Win * (N - 1) + 1:Win * N);
+end
+
+f = NaN(1000, num);
+P = NaN(1000, num);
+
+for N = (1:num)
+    [qr, lo, y(N, :)] = rr_interval(Time_Arr(:, N), ECG_Arr(:, N));
+    [ti, HRV] = MakeHRV(lo);
+    [fr, P1] = freqHRV1(HRV, length(HRV), SamplingTime);
+    f(1:length(fr), N) = fr;
+    P(1:length(P1), N) = P1;
+end
+end
+~~~
+
+~~~Matlab freqHRVtotal.m
+function [VLF, LF, HF] = freqHRVtotal(f, P)
+for N = (1:length(f(1,:)))
+[f1, f2, f3] = freqHRVanalysis(f(:, N), P(:, N));
+VLF(N) = f1;
+LF(N) = f2;
+HF(N) = f3;
+end
+end
 ~~~
