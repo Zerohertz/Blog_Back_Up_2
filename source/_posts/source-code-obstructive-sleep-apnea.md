@@ -504,15 +504,15 @@ end
 
 ## Detecting R-R Interval
 
-~~~Matlab rr_interval.mat
-function [qrspeaks, locs, y] = rr_interval(time,ecg)
+~~~Matlab rrInterval.mat
+function [qrspeaks, locs, y] = rrInterval(time, ecg)
 t = time;
 wt = modwt(ecg, 5);
 wtrec = zeros(size(wt));
 wtrec(4:5, :) = wt(4:5, :);
 y = imodwt(wtrec, 'sym4');
 y = abs(y).^2;
-[qrspeaks, locs] = findpeaks(y, t, 'MinPeakHeight', 0.35, 'MinPeakDistance', 0.150); %time과 y에 대한 그래프를 해석 후 파라미터 결정
+[qrspeaks, locs] = findpeaks(y, t, 'MinPeakHeight', 0.025, 'MinPeakDistance', 0.150); %time과 y에 대한 그래프를 해석 후 파라미터 결정
 end
 ~~~
 
@@ -530,7 +530,7 @@ end
 <img width="1051" alt="R Peaks Localized by Wavelet Transform with Automatic Annotations" src="https://user-images.githubusercontent.com/42334717/103263042-11847380-49ea-11eb-8daa-b840f7f837a5.png">
 
 ~~~Matlab
->> [qr, lo, y] = rr_interval(tm, ecgsig);
+>> [qr, lo, y] = rrInterval(tm, ecgsig);
 >> plot(tm, y)
 >> hold on
 >> plot(lo, qr, 'ro')
@@ -540,8 +540,8 @@ end
 
 ## Make HRV Data from R-R Interval
 
-~~~Matlab MakeHRV.m
-function [time, val] = MakeHRV(locat)
+~~~Matlab makeHRV.m
+function [time, val] = makeHRV(locat)
 for num = (1:length(locat)-1)
     val(num) = locat(num + 1) - locat(num);
     time(num) = locat(num);
@@ -560,7 +560,8 @@ end
 
 ~~~Matlab
 wfdb2mat('FileName');
-[tm, ecg, Fs, labels] = rdmat('FileNamem');
+[tm, ecg, Fs, labels] = rdmat('FileName' + 'm');
+[apn_tm, apn]= rdann('FileName', 'apn');
 ~~~
 
 ## Time Domain Analysis
@@ -574,7 +575,7 @@ function [f, P1] = freqHRV(hrv, Length, SamplingTime)
 y=fft(hrv);
 SamplingRate = Length / SamplingTime;
 P2 = abs(y/Length);
-P1 = P2(1:Length/2+1);
+P1 = P2(1:fix(Length/2)+1);
 P1(2:end-1) = 2*P1(2:end-1);
 f = SamplingRate * (0:(Length/2))/Length;
 end
@@ -618,52 +619,13 @@ for num = (1:length(freq))
 end
 ~~~
 
-~~~Matlab
->> load mit200
->> [qr, lo, y] = rr_interval(tm, ecgsig)
->> [ti, hrv] = MakeHRV(lo)
->> [f1, p1] = freqHRV(hrv, 40, 27.775)
->> [f2, p2] = freqHRV1(hrv, 40, 27.775)
->> [VLF, LF, HF] = freqHRVanalysis(f1, p1)
-
-VLF =
-
-    0.0485
-
-
-LF =
-
-    0.0244
-
-
-HF =
-
-    0.0373
-
->> [VLF, LF, HF] = freqHRVanalysis(f2, p2)
-
-VLF =
-
-    0.4465
-
-
-LF =
-
-    0.1021
-
-
-HF =
-
-    0.0597
-~~~
-
 ~~~Matlab windowHRV.m
 function [f, P] = windowHRV(time, ECG, SamplingRate, Winsize)
 %Sampling Rate(Hz)
 %Window size(Min)
 SamplingTime = Winsize * 60;
 Win = fix(SamplingRate * SamplingTime);
-num = fix(length(ECG) / Win);
+num = fix(length(ECG) / Win) - 1;
 
 for N = (1:num)
     Time_Arr(:, N) = time(Win * (N - 1) + 1:Win * N);
@@ -674,8 +636,8 @@ f = NaN(1000, num);
 P = NaN(1000, num);
 
 for N = (1:num)
-    [qr, lo, y(N, :)] = rr_interval(Time_Arr(:, N), ECG_Arr(:, N));
-    [ti, HRV] = MakeHRV(lo);
+    [~, lo, ~] = rrInterval(Time_Arr(:, N), ECG_Arr(:, N));
+    [~, HRV] = makeHRV(lo);
     [fr, P1] = freqHRV1(HRV, length(HRV), SamplingTime);
     f(1:length(fr), N) = fr;
     P(1:length(P1), N) = P1;
@@ -683,13 +645,112 @@ end
 end
 ~~~
 
-~~~Matlab freqHRVtotal.m
-function [VLF, LF, HF] = freqHRVtotal(f, P)
+~~~Matlab windowSpO2.m
+function [SpO2] = windowSpO2(data, SamplingRate, Winsize)
+SamplingTime = Winsize * 60;
+Win = fix(SamplingRate * SamplingTime);
+num = fix(length(data) / Win) - 1;
+
+for N = (1:num)
+    SpO2_Arr(:, N) = data(Win * (N - 1) + 1:Win * N);
+end
+
+for N = (1:num)
+    SpO2(N) = mean(SpO2_Arr(:, N));
+end
+end
+~~~
+
+~~~Matlab freqHRVCI.m
+function [F] = freqHRVCI(f, P)
 for N = (1:length(f(1,:)))
 [f1, f2, f3] = freqHRVanalysis(f(:, N), P(:, N));
-VLF(N) = f1;
-LF(N) = f2;
-HF(N) = f3;
+F(N, 1) = f1;
+F(N, 2) = f2;
+F(N, 3) = f3;
 end
+end
+~~~
+
+~~~Matlab makeTableofHRV.m
+function [tab] = makeTableofHRV(tm, data, SamplingRate, Windowsize, Apn)
+[f, p] = windowHRV(tm, data(:, 1), SamplingRate, Windowsize);
+F = freqHRVCI(f, p);
+sp = windowSpO2(data(:, 5), SamplingRate, Windowsize);
+
+tab = table(F(:, 1), F(:, 2), F(:, 3), sp');
+tab.Properties.VariableNames{'Var1'} = 'VLF';
+tab.Properties.VariableNames{'Var2'} = 'LF';
+tab.Properties.VariableNames{'Var3'} = 'HF';
+tab.Properties.VariableNames{'Var4'} = 'SpO2';
+end
+~~~
+
+~~~Matlab makeLabelofHRV.m
+function [tab] = makeLabelofHRV(tm, data, SamplingRate, Windowsize, Apn)
+[f, p] = windowHRV(tm, data(:, 1), SamplingRate, Windowsize);
+F = freqHRVCI(f, p);
+sp = windowSpO2(data(:, 5), SamplingRate, Windowsize);
+
+for N = (1:length(sp)) % 78(Normal) / 65(Apnea)
+    apn(N) = mean(Apn(Windowsize * (N - 1) + 1:Windowsize * N));
+end
+
+apn = abs(apn - 78) / (78 - 65);
+tab = table(F(:, 1), F(:, 2), F(:, 3), sp', apn');
+tab.Properties.VariableNames{'Var1'} = 'VLF';
+tab.Properties.VariableNames{'Var2'} = 'LF';
+tab.Properties.VariableNames{'Var3'} = 'HF';
+tab.Properties.VariableNames{'Var4'} = 'SpO2';
+tab.Properties.VariableNames{'Var5'} = 'apn';
+end
+~~~
+
+~~~Matlab apneaFreqPlot.m
+function [tab] = apneaFreqPlot(paramName)
+cd apnea-ecg-database-1.0.0/
+wfdb2mat(paramName);
+[tm, data] = rdmat(append(paramName, 'm'));
+[~, apn] = rdann(paramName, 'apn');
+cd ..
+
+tab = makeLabelofHRV(tm, data, 100, 5, apn);
+
+fig = figure;
+set(fig, 'Position', [0 0 1920 1080])
+
+subplot(3,1,1)
+plot(tab.VLF, 'Color', '#0072BD', 'LineWidth', 1)
+hold on
+plot(tab.LF, 'Color', '#A2142F', 'LineWidth', 1)
+plot(tab.HF, 'Color', '#EDB120', 'LineWidth', 1)
+plot(tab.VLF, 'Color', '#0072BD', 'Marker', '+', 'LineWidth', 1)
+plot(tab.LF, 'Color', '#A2142F', 'Marker', '*', 'LineWidth', 1)
+plot(tab.HF, 'Color', '#EDB120', 'Marker', 'o', 'LineWidth', 1)
+legend('VLF', 'LF', 'HF')
+xlabel('Time(5min)')
+ylabel('Amplitude')
+grid on
+set(gca, 'fontsize', 15)
+
+subplot(3,1,2)
+plot(tab.SpO2,'Color', '#77AC30', 'LineWidth', 1)
+plot(tab.SpO2,'Color', '#77AC30', 'Marker', 'o', 'LineWidth', 1)
+xlabel('Time(5min)')
+ylabel('SpO2')
+grid on
+set(gca, 'fontsize', 15)
+
+subplot(3,1,3)
+plot(tab.apn, 'Color', 'magenta', 'LineWidth', 1)
+plot(tab.apn, 'Color', 'magenta', 'Marker', 'o', 'LineWidth', 1)
+xlabel('Time(5min)')
+ylabel('0(Normal) / 1(Apnea)')
+grid on
+set(gca, 'fontsize', 15)
+
+cd plot/
+saveas(gca, append(paramName, '.bmp'))
+cd ..
 end
 ~~~
