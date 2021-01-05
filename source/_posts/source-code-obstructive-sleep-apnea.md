@@ -512,7 +512,7 @@ wtrec = zeros(size(wt));
 wtrec(4:5, :) = wt(4:5, :);
 y = imodwt(wtrec, 'sym4');
 y = abs(y).^2;
-[qrspeaks, locs] = findpeaks(y, t, 'MinPeakHeight', 0.025, 'MinPeakDistance', 0.150); %time과 y에 대한 그래프를 해석 후 파라미터 결정
+[qrspeaks, locs] = findpeaks(y, t, 'MinPeakHeight', 0.15, 'MinPeakDistance', 0.450); %time과 y에 대한 그래프를 해석 후 파라미터 결정
 end
 ~~~
 
@@ -551,6 +551,68 @@ end
 > HRV
 
 ![HRV](https://user-images.githubusercontent.com/42334717/103266138-4f859580-49f2-11eb-8ca9-ee74b18e45d7.jpg)
+
+~~~Matlab checkRR.m
+function [] = checkRR(paramName, size, param)
+cd apnea-ecg-database-1.0.0/
+wfdb2mat(paramName);
+[tm, data] = rdmat(append(paramName, 'm'));
+cd ..
+
+ecg = data(:, 1);
+tm = tm(1:(length(tm)/10));
+ecg = ecg(1:(length(ecg)/10));
+ra = fix(rand() * length(tm) / 200);
+
+[qr, lo, y] = rrIntervalparam(tm, ecg, param);
+[tt, hh] = makeHRV(lo);
+
+i = 1;
+
+for N = lo
+    num = find(tm == N);
+    rPeak(i) = ecg(num);
+    i = i + 1;
+end
+
+fig = figure;
+set(fig, 'Position', [0 0 1920 1080])
+
+subplot(3,1,1)
+plot(tm, ecg, 'LineWidth', 1)
+hold on
+plot(lo, rPeak, 'ro')
+axis([ra ra + size -1 3])
+xlabel('Time(sec)')
+ylabel('ECG(mV)')
+grid on
+set(gca, 'fontsize', 15)
+
+subplot(3,1,2)
+plot(tm, y, 'LineWidth', 1)
+hold on
+plot(lo, qr, 'ro')
+axis([ra ra + size 0 0.9])
+xlabel('Time(sec)')
+ylabel('Amplitude')
+grid on
+set(gca, 'fontsize', 15)
+
+subplot(3,1,3)
+bar(tt, hh, 0.01)
+hold on
+plot(tt, hh, 'ro')
+axis([ra ra + size 0 2])
+xlabel('Time(sec)')
+ylabel('HRV(sec)')
+grid on
+set(gca, 'fontsize', 15)
+
+cd RR/
+saveas(gca, append(append(paramName, 'checkRR', string(param)), '.bmp'))
+cd ..
+end
+~~~
 
 ***
 
@@ -625,7 +687,7 @@ function [f, P] = windowHRV(time, ECG, SamplingRate, Winsize)
 %Window size(Min)
 SamplingTime = Winsize * 60;
 Win = fix(SamplingRate * SamplingTime);
-num = fix(length(ECG) / Win) - 1;
+num = fix(length(ECG) / Win) - 10;
 
 for N = (1:num)
     Time_Arr(:, N) = time(Win * (N - 1) + 1:Win * N);
@@ -649,7 +711,7 @@ end
 function [SpO2] = windowSpO2(data, SamplingRate, Winsize)
 SamplingTime = Winsize * 60;
 Win = fix(SamplingRate * SamplingTime);
-num = fix(length(data) / Win) - 1;
+num = fix(length(data) / Win) - 10;
 
 for N = (1:num)
     SpO2_Arr(:, N) = data(Win * (N - 1) + 1:Win * N);
@@ -687,70 +749,106 @@ end
 ~~~
 
 ~~~Matlab makeLabelofHRV.m
-function [tab] = makeLabelofHRV(tm, data, SamplingRate, Windowsize, Apn)
-[f, p] = windowHRV(tm, data(:, 1), SamplingRate, Windowsize);
-F = freqHRVCI(f, p);
-sp = windowSpO2(data(:, 5), SamplingRate, Windowsize);
+function [tab] = makeLabelofHRV(tm, ecg, SamplingRate, Windowsize, tmApn, Apn)
+init = tmApn(1);
+tm = tm(init:length(tm));
+ecg = ecg(init:length(ecg));
 
-for N = (1:length(sp)) % 78(Normal) / 65(Apnea)
+[f, p] = windowHRV(tm, ecg, SamplingRate, Windowsize);
+F = freqHRVCI(f, p);
+
+for N = (1:length(F)) % 78(Normal) / 65(Apnea)
     apn(N) = mean(Apn(Windowsize * (N - 1) + 1:Windowsize * N));
 end
 
 apn = abs(apn - 78) / (78 - 65);
-tab = table(F(:, 1), F(:, 2), F(:, 3), sp', apn');
+tab = table(F(:, 1), F(:, 2), F(:, 3), apn');
 tab.Properties.VariableNames{'Var1'} = 'VLF';
 tab.Properties.VariableNames{'Var2'} = 'LF';
 tab.Properties.VariableNames{'Var3'} = 'HF';
-tab.Properties.VariableNames{'Var4'} = 'SpO2';
-tab.Properties.VariableNames{'Var5'} = 'apn';
+tab.Properties.VariableNames{'Var4'} = 'apn';
 end
 ~~~
 
 ~~~Matlab apneaFreqPlot.m
-function [tab] = apneaFreqPlot(paramName)
+function [tab] = apneaFreqPlot(paramName, Winsize)
 cd apnea-ecg-database-1.0.0/
 wfdb2mat(paramName);
 [tm, data] = rdmat(append(paramName, 'm'));
-[~, apn] = rdann(paramName, 'apn');
+[tmApn, apn] = rdann(paramName, 'apn');
 cd ..
 
-tab = makeLabelofHRV(tm, data, 100, 5, apn);
+tab = makeLabelofHRV(tm, data, 100, Winsize, tmApn, apn);
+
+tim = (1:height(tab))*Winsize;
+
 
 fig = figure;
 set(fig, 'Position', [0 0 1920 1080])
 
 subplot(3,1,1)
-plot(tab.VLF, 'Color', '#0072BD', 'LineWidth', 1)
+plot(tim, tab.HF, 'Color', 'black', 'LineWidth', 1.2)
 hold on
-plot(tab.LF, 'Color', '#A2142F', 'LineWidth', 1)
-plot(tab.HF, 'Color', '#EDB120', 'LineWidth', 1)
-plot(tab.VLF, 'Color', '#0072BD', 'Marker', '+', 'LineWidth', 1)
-plot(tab.LF, 'Color', '#A2142F', 'Marker', '*', 'LineWidth', 1)
-plot(tab.HF, 'Color', '#EDB120', 'Marker', 'o', 'LineWidth', 1)
-legend('VLF', 'LF', 'HF')
-xlabel('Time(5min)')
+plot(tim(tab.apn == 0), tab.HF(tab.apn == 0), 'Color', 'blue', 'Marker', 'o', 'LineWidth', 2, 'LineStyle', 'none')
+plot(tim(tab.apn > 0), tab.HF(tab.apn > 0), 'Color', 'red', 'Marker', '*', 'LineWidth', 2, 'LineStyle', 'none')
+legend('HF', 'Normal', 'Apnea')
+xlabel('Time(min)')
 ylabel('Amplitude')
 grid on
 set(gca, 'fontsize', 15)
 
 subplot(3,1,2)
-plot(tab.SpO2,'Color', '#77AC30', 'LineWidth', 1)
-plot(tab.SpO2,'Color', '#77AC30', 'Marker', 'o', 'LineWidth', 1)
-xlabel('Time(5min)')
-ylabel('SpO2')
+plot(tim, tab.LF, 'Color', 'black', 'LineWidth', 1.2)
+hold on
+plot(tim(tab.apn == 0), tab.LF(tab.apn == 0), 'Color', 'blue', 'Marker', 'o', 'LineWidth', 2, 'LineStyle', 'none')
+plot(tim(tab.apn > 0), tab.LF(tab.apn > 0), 'Color', 'red', 'Marker', '*', 'LineWidth', 2, 'LineStyle', 'none')
+legend('LF', 'Normal', 'Apnea')
+xlabel('Time(min)')
+ylabel('Amplitude')
 grid on
 set(gca, 'fontsize', 15)
 
 subplot(3,1,3)
-plot(tab.apn, 'Color', 'magenta', 'LineWidth', 1)
-plot(tab.apn, 'Color', 'magenta', 'Marker', 'o', 'LineWidth', 1)
-xlabel('Time(5min)')
-ylabel('0(Normal) / 1(Apnea)')
+plot(tim, tab.VLF, 'Color', 'black', 'LineWidth', 1.2)
+hold on
+plot(tim(tab.apn == 0), tab.VLF(tab.apn == 0), 'Color', 'blue', 'Marker', 'o', 'LineWidth', 2, 'LineStyle', 'none')
+plot(tim(tab.apn > 0), tab.VLF(tab.apn > 0), 'Color', 'red', 'Marker', '*', 'LineWidth', 2, 'LineStyle', 'none')
+legend('VLF', 'Normal', 'Apnea')
+xlabel('Time(min)')
+ylabel('Amplitude')
 grid on
 set(gca, 'fontsize', 15)
 
 cd plot/
 saveas(gca, append(paramName, '.bmp'))
 cd ..
+end
+~~~
+
+> 1min
+
+<img width="1590" alt="1min" src="https://user-images.githubusercontent.com/42334717/103643395-f4c2df80-4f97-11eb-9a15-2fd5a7b9a5e2.png">
+
+> 5min
+
+<img width="1590" alt="5min" src="https://user-images.githubusercontent.com/42334717/103643405-fa202a00-4f97-11eb-980f-1bb66f5a9e10.png">
+
+~~~Matlab makeTrainData.m
+function [tab] = makeTrainData(paramName, Winsize)
+cd apnea-ecg-database-1.0.0/
+wfdb2mat(paramName);
+[tm, data] = rdmat(append(paramName, 'm'));
+[tmApn, apn] = rdann(paramName, 'apn');
+cd ..
+
+tab = makeLabelofHRV(tm, data, 100, Winsize, tmApn, apn);
+
+for N = 1:height(tab)
+    if tab.apn(N) == 0
+        tab.label(N) = "Normal";
+    else
+        tab.label(N) = "Apnea";
+    end
+end
 end
 ~~~
