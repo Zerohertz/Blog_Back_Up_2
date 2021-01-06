@@ -512,7 +512,7 @@ wtrec = zeros(size(wt));
 wtrec(4:5, :) = wt(4:5, :);
 y = imodwt(wtrec, 'sym4');
 y = abs(y).^2;
-[qrspeaks, locs] = findpeaks(y, t, 'MinPeakHeight', 0.15, 'MinPeakDistance', 0.450); %time과 y에 대한 그래프를 해석 후 파라미터 결정
+[qrspeaks, locs] = findpeaks(y, t, 'MinPeakHeight', 0.1, 'MinPeakDistance', 0.450); %time과 y에 대한 그래프를 해석 후 파라미터 결정
 end
 ~~~
 
@@ -543,7 +543,7 @@ end
 ~~~Matlab makeHRV.m
 function [time, val] = makeHRV(locat)
 for num = (1:length(locat)-1)
-    val(num) = locat(num + 1) - locat(num);
+    val(num) = (locat(num + 1) - locat(num)) * 1000;
     time(num) = locat(num);
 end
 end
@@ -603,9 +603,9 @@ subplot(3,1,3)
 bar(tt, hh, 0.01)
 hold on
 plot(tt, hh, 'ro')
-axis([ra ra + size 0 2])
+axis([ra ra + size 0 2000])
 xlabel('Time(sec)')
-ylabel('HRV(sec)')
+ylabel('HRV(msec)')
 grid on
 set(gca, 'fontsize', 15)
 
@@ -640,7 +640,7 @@ SamplingRate = Length / SamplingTime;
 P2 = abs(y/Length);
 P1 = P2(1:fix(Length/2)+1);
 P1(2:end-1) = 2*P1(2:end-1);
-f = SamplingRate * (0:(Length/2))/Length;
+f = SamplingRate * (0:(fix(Length/2)))/Length;
 end
 ~~~
 
@@ -663,11 +663,11 @@ VLF_amp(1) = 1;
 LF_amp(1) = 1;
 HF_amp(1) = 1;
 for num = (1:length(freq))
-    if 0.003 <= freq(num) && freq(num) < 0.05
+    if 0.003 <= freq(num) && freq(num) < 0.04
         %VLF_freq(i) = freq(num);
         VLF_amp(i) = amp(num)^2;
         i = i + 1;
-    elseif 0.05 <= freq(num) && freq(num) < 0.15
+    elseif 0.04 <= freq(num) && freq(num) < 0.15
         %LF_freq(j) = freq(num);
         LF_amp(j) = amp(num)^2;
         j = j + 1;
@@ -691,9 +691,9 @@ SamplingTime = Winsize * 60;
 Win = fix(SamplingRate * SamplingTime);
 num = fix(length(ECG) / Win) - 10;
 
-% [~,ll,~]=rrInterval(time, ECG);
-% [~,bb]=makeHRV(ll);
-% freqHRVplot1(bb, length(bb), length(bb) / 100);
+[~,ll,~]=rrInterval(time, ECG);
+[~,bb]=makeHRV(ll);
+freqHRVplot(bb, length(bb), length(bb) / 100);
 
 for N = (1:num)
     Time_Arr(:, N) = time(Win * (N - 1) + 1:Win * N);
@@ -705,8 +705,8 @@ P = NaN(1000, num);
 
 for N = (1:num)
     [~, lo, ~] = rrInterval(Time_Arr(:, N), ECG_Arr(:, N));
-    [~, HRV] = makeHRV(lo);
-    [fr, P1] = freqHRV1(HRV, length(HRV), SamplingTime);
+    [winTime, HRV] = makeHRV(lo);
+    [fr, P1] = freqHRV(HRV, length(HRV), SamplingTime);
     f(1:length(fr), N) = fr;
     P(1:length(P1), N) = P1;
 end
@@ -799,7 +799,7 @@ plot(tim(tab.apn == 0), tab.HF(tab.apn == 0), 'Color', 'blue', 'Marker', 'o', 'L
 plot(tim(tab.apn > 0), tab.HF(tab.apn > 0), 'Color', 'red', 'Marker', '*', 'LineWidth', 2, 'LineStyle', 'none')
 legend('HF', 'Normal', 'Apnea')
 xlabel('Time(min)')
-ylabel('Amplitude')
+ylabel('Amplitude(msec)')
 grid on
 set(gca, 'fontsize', 15)
 
@@ -810,7 +810,7 @@ plot(tim(tab.apn == 0), tab.LF(tab.apn == 0), 'Color', 'blue', 'Marker', 'o', 'L
 plot(tim(tab.apn > 0), tab.LF(tab.apn > 0), 'Color', 'red', 'Marker', '*', 'LineWidth', 2, 'LineStyle', 'none')
 legend('LF', 'Normal', 'Apnea')
 xlabel('Time(min)')
-ylabel('Amplitude')
+ylabel('Amplitude(msec)')
 grid on
 set(gca, 'fontsize', 15)
 
@@ -821,7 +821,7 @@ plot(tim(tab.apn == 0), tab.VLF(tab.apn == 0), 'Color', 'blue', 'Marker', 'o', '
 plot(tim(tab.apn > 0), tab.VLF(tab.apn > 0), 'Color', 'red', 'Marker', '*', 'LineWidth', 2, 'LineStyle', 'none')
 legend('VLF', 'Normal', 'Apnea')
 xlabel('Time(min)')
-ylabel('Amplitude')
+ylabel('Amplitude(msec)')
 grid on
 set(gca, 'fontsize', 15)
 
