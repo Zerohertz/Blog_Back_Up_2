@@ -546,6 +546,7 @@ for num = (1:length(locat)-1)
     val(num) = locat(num + 1) - locat(num);
     time(num) = locat(num);
 end
+end
 ~~~
 
 > HRV
@@ -649,7 +650,7 @@ SamplingRate = Length / SamplingTime;
 NFFT = 2^(ceil(log2(length(hrv))));
 Y = fft(hrv, NFFT) / Length;
 f = SamplingRate / 2 * linspace(0, 1, NFFT / 2 + 1);
-P1 = 2*abs(Y(1:NFFT/2+1));
+P1 = 2*abs(Y(1:fix(NFFT/2+1)));
 end
 ~~~
 
@@ -664,20 +665,21 @@ HF_amp(1) = 1;
 for num = (1:length(freq))
     if 0.003 <= freq(num) && freq(num) < 0.05
         %VLF_freq(i) = freq(num);
-        VLF_amp(i) = amp(num);
+        VLF_amp(i) = amp(num)^2;
         i = i + 1;
     elseif 0.05 <= freq(num) && freq(num) < 0.15
         %LF_freq(j) = freq(num);
-        LF_amp(j) = amp(num);
+        LF_amp(j) = amp(num)^2;
         j = j + 1;
     elseif 0.15 <= freq(num) && freq(num) <= 0.4
         %HF_freq(k) = freq(num);
-        HF_amp(k) = amp(num);
+        HF_amp(k) = amp(num)^2;
         k = k + 1;
-    end
-    VLF = mean(VLF_amp);
-    LF = mean(LF_amp);
-    HF = mean(HF_amp);    
+    end      
+end
+VLF = mean(VLF_amp);
+LF = mean(LF_amp);
+HF = mean(HF_amp); 
 end
 ~~~
 
@@ -688,6 +690,10 @@ function [f, P] = windowHRV(time, ECG, SamplingRate, Winsize)
 SamplingTime = Winsize * 60;
 Win = fix(SamplingRate * SamplingTime);
 num = fix(length(ECG) / Win) - 10;
+
+% [~,ll,~]=rrInterval(time, ECG);
+% [~,bb]=makeHRV(ll);
+% freqHRVplot1(bb, length(bb), length(bb) / 100);
 
 for N = (1:num)
     Time_Arr(:, N) = time(Win * (N - 1) + 1:Win * N);
