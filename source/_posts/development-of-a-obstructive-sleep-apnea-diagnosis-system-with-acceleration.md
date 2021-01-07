@@ -2,8 +2,8 @@
 title: Development of a Obstructive Sleep Apnea Diagnosis System with Acceleration
 date: 2020-07-27 18:27:01
 categories:
-- Research
-- Journal
+- C, C++
+- Arduino
 tags:
 - PHM
 - Statistics

@@ -1,9 +1,8 @@
 ---
 title: Development of a Obstructive Sleep Apnea Diagnosis Algorithm Using HRV
-date: 2021-01-07 10:30:26
+date: 2021-01-07 10:30:29
 categories:
-- Research
-- Journal
+- Matlab
 tags:
 - Machine Learning
 - DNN
@@ -15,116 +14,357 @@ tags:
 - Sleep apnea
 mathjax: true
 ---
-# Introduction
+[Source in Github](https://github.com/Zerohertz/Development-of-a-Obstructive-Sleep-Apnea-Diagnosis-Algorithm-Using-HRV)
 
-+ Obstructive Sleep Apnea(폐쇄성 수면무호흡증)
-  + 정의 : 수면 중 상기도가 좁아지거나 막혀 무호흡과 저호흡이 되풀이되는 질환
-  + 위험성 : 혈중 산소포화도 감소 - 산소를 많이 필요로 하는 장기(뇌, 심장)에 영향
-    + 증상 : 두통, 기억력 및 집중력 저하, ...
-    + 질환 : 수면질환(불면증), 고혈압, 심부정맥, 신부전 및 관상 동맥, ...
-  + 유병률 : 국내 농촌인구의 3%, 미국 중년 남성의 4%, 여성의 2%
-+ 현재의 기술 - 야간 수면다원검사
-  + 여러 가지 감지기 부착
-  + 평소의 수면환경이 아닌 수면검사실에서 수면
-  + 장시간 검사에 따른 높은 비용
-  + 현실적 대안 : 간이형 수면다원기록기 or 활동 기록기
-+ 손목부착형 활동기록기(액티그라피)
-  + 손목 운동에 따른 가속을 감지해 몸의 활동량을 측정
-  + 사용이 간편하며 피험자에게 익숙한 환경에서 장기간 검사 가능
-  + 수면다원검사에 비해 경제적 이점
-  + 미국수면학회 : 불면증과 일주기 수면-각성 장애에서 유용
-  + 수면분절지수에 의해 민감도가 특이도가 낮음
-    + 무호흡 및 저호흡과 관련된 움직임의 빈도만 반영
-  + 수면무호흡수치 반영
-    + 폐쇄성 수면무호흡증 환자의 수면 시간을 짧게 평가하는 현상 개선
-+ 기술개발계획
-  + 심박변이도 신호 분석을 통한 폐쇄성 수면무호흡증 진단 알고리즘 개발
-  + 음성신호 분석을 위한 마이크 이용
-  + 획득된 폐쇄성 수면무호흡수치를 바탕으로 수면/각성 주기 계산 알고리즘 개발
+# HRV(Heart Rate Variability)
+
+## Detecting R-R Interval
+
+~~~Matlab rrInterval.mat
+function [qrspeaks, locs, y] = rrInterval(time, ecg)
+t = time;
+wt = modwt(ecg, 5);
+wtrec = zeros(size(wt));
+wtrec(4:5, :) = wt(4:5, :);
+y = imodwt(wtrec, 'sym4');
+y = abs(y).^2;
+[qrspeaks, locs] = findpeaks(y, t, 'MinPeakHeight', 0.1, 'MinPeakDistance', 0.450); %time과 y에 대한 그래프를 해석 후 파라미터 결정
+end
+~~~
+
+> ECG
+
+<img width="672" alt="ECG" src="https://user-images.githubusercontent.com/42334717/103261452-fbc07f80-49e4-11eb-8181-4251df1a5af5.png">
+
+~~~Matlab
+>> load mit200
+>> plot(tm, ecgsig)
+~~~
 
 <!-- More -->
 
+> R Peaks Localized by Wavelet Transform with Automatic Annotations
+
+<img width="1051" alt="R Peaks Localized by Wavelet Transform with Automatic Annotations" src="https://user-images.githubusercontent.com/42334717/103263042-11847380-49ea-11eb-8daa-b840f7f837a5.png">
+
+~~~Matlab
+>> [qr, lo, y] = rrInterval(tm, ecgsig);
+>> plot(tm, y)
+>> hold on
+>> plot(lo, qr, 'ro')
+>> plot(tm(ann), y(ann), 'k*')
+>> grid on
+~~~
+
+## Make HRV Data from R-R Interval
+
+~~~Matlab makeHRV.m
+function [time, val] = makeHRV(locat)
+for num = (1:length(locat)-1)
+    val(num) = (locat(num + 1) - locat(num)) * 1000;
+    time(num) = locat(num);
+end
+end
+~~~
+
+> HRV
+
+![HRV](https://user-images.githubusercontent.com/42334717/103266138-4f859580-49f2-11eb-8ca9-ee74b18e45d7.jpg)
+
+~~~Matlab checkRR.m
+function [] = checkRR(paramName, size, param)
+cd apnea-ecg-database-1.0.0/
+wfdb2mat(paramName);
+[tm, data] = rdmat(append(paramName, 'm'));
+cd ..
+
+ecg = data(:, 1);
+tm = tm(1:(length(tm)/10));
+ecg = ecg(1:(length(ecg)/10));
+ra = fix(rand() * length(tm) / 200);
+
+[qr, lo, y] = rrIntervalparam(tm, ecg, param);
+[tt, hh] = makeHRV(lo);
+
+i = 1;
+
+for N = lo
+    num = find(tm == N);
+    rPeak(i) = ecg(num);
+    i = i + 1;
+end
+
+fig = figure;
+set(fig, 'Position', [0 0 1920 1080])
+
+subplot(3,1,1)
+plot(tm, ecg, 'LineWidth', 1)
+hold on
+plot(lo, rPeak, 'ro')
+axis([ra ra + size -1 3])
+xlabel('Time(sec)')
+ylabel('ECG(mV)')
+grid on
+set(gca, 'fontsize', 15)
+
+subplot(3,1,2)
+plot(tm, y, 'LineWidth', 1)
+hold on
+plot(lo, qr, 'ro')
+axis([ra ra + size 0 0.9])
+xlabel('Time(sec)')
+ylabel('Amplitude')
+grid on
+set(gca, 'fontsize', 15)
+
+subplot(3,1,3)
+bar(tt, hh, 0.01)
+hold on
+plot(tt, hh, 'ro')
+axis([ra ra + size 0 2000])
+xlabel('Time(sec)')
+ylabel('HRV(msec)')
+grid on
+set(gca, 'fontsize', 15)
+
+cd RR/
+saveas(gca, append(append(paramName, 'checkRR', string(param)), '.bmp'))
+cd ..
+end
+~~~
+
 ***
 
-# Condition Indicator(HRV)
+# Condition Indicators of HRV
 
-+ 비침습적인 심박변이도(Heart Rate Variability, HRV)
-  + 심전도상의 R-R 간격 변화 측정
-    + R-R 간격 : 하나의 심장 주기와 다음 심장 주기 사이의 미세한 변이
-  + 일반적으로 교감신경과 부교감신경의 영향을 받아 조절되는 것으로 알려짐
-  + 수면은 자율신경계에 영향을 주며, 이는 곧 HRV에 영향을 줌
-    + 수면무호흡증과의 상관관계
-  + 영향을 주는 인자 : 호흡, 혈합, 호르몬, 감정, ...
+> Data 사용
+
+~~~Matlab
+wfdb2mat('FileName');
+[tm, ecg, Fs, labels] = rdmat('FileName' + 'm');
+[apn_tm, apn]= rdann('FileName', 'apn');
+~~~
+
+## Time Domain Analysis
 
 
-## Time domain analysis
 
-> R-R 간격의 변화(NN interval)를 통계적 분석
+## Frequency Domain Analysis
 
-+ SDNN
-+ SDNN index
-+ RMSSD
-+ pNN50
-+ SDANN
+~~~Matlab freqHRV.m
+function [f, P1] = freqHRV(hrv, Length, SamplingTime)
+y=fft(hrv);
+SamplingRate = Length / SamplingTime;
+P2 = abs(y/Length);
+P1 = P2(1:fix(Length/2)+1);
+P1(2:end-1) = 2*P1(2:end-1);
+f = SamplingRate * (0:(fix(Length/2)))/Length;
+end
+~~~
 
-## Frequency domain analysis
+~~~Matlab freqHRV1.m
+function [f, P1] = freqHRV1(hrv, Length, SamplingTime)
+SamplingRate = Length / SamplingTime;
+NFFT = 2^(ceil(log2(length(hrv))));
+Y = fft(hrv, NFFT) / Length;
+f = SamplingRate / 2 * linspace(0, 1, NFFT / 2 + 1);
+P1 = 2*abs(Y(1:fix(NFFT/2+1)));
+end
+~~~
 
-> R-R 간격의 주기적 진동을 주파수와 진폭으로 분석
+~~~Matlab freqHRVanalysis.m
+function [VLF, LF, HF] = freqHRVanalysis(freq, amp)
+i = 1;
+j = 1;
+k = 1;
+VLF_amp(1) = 1;
+LF_amp(1) = 1;
+HF_amp(1) = 1;
+for num = (1:length(freq))
+    if 0.003 <= freq(num) && freq(num) < 0.04
+        %VLF_freq(i) = freq(num);
+        VLF_amp(i) = amp(num)^2;
+        i = i + 1;
+    elseif 0.04 <= freq(num) && freq(num) < 0.15
+        %LF_freq(j) = freq(num);
+        LF_amp(j) = amp(num)^2;
+        j = j + 1;
+    elseif 0.15 <= freq(num) && freq(num) <= 0.4
+        %HF_freq(k) = freq(num);
+        HF_amp(k) = amp(num)^2;
+        k = k + 1;
+    end      
+end
+VLF = mean(VLF_amp);
+LF = mean(LF_amp);
+HF = mean(HF_amp); 
+end
+~~~
 
-+ VLF(Very Low frequency) : 0.003~0.04Hz
-+ LF(Low Frequency) : 0.04~0.15Hz
-+ HF(High Frequency) : 0.15~0.4Hz
+~~~Matlab windowHRV.m
+function [f, P] = windowHRV(time, ECG, SamplingRate, Winsize)
+%Sampling Rate(Hz)
+%Window size(Min)
+SamplingTime = Winsize * 60;
+Win = fix(SamplingRate * SamplingTime);
+num = fix(length(ECG) / Win) - 10;
 
-***
+[~,ll,~]=rrInterval(time, ECG);
+[~,bb]=makeHRV(ll);
+freqHRVplot(bb, length(bb), length(bb) / 100);
 
-# Data Result
+for N = (1:num)
+    Time_Arr(:, N) = time(Win * (N - 1) + 1:Win * N);
+    ECG_Arr(:, N) = ECG(Win * (N - 1) + 1:Win * N);
+end
 
-## 2020/07/22
+f = NaN(1000, num);
+P = NaN(1000, num);
 
-> 특수문자 사용으로 인한 .csv 파일 저장 오류
+for N = (1:num)
+    [~, lo, ~] = rrInterval(Time_Arr(:, N), ECG_Arr(:, N));
+    [winTime, HRV] = makeHRV(lo);
+    [fr, P1] = freqHRV(HRV, length(HRV), SamplingTime);
+    f(1:length(fr), N) = fr;
+    P(1:length(P1), N) = P1;
+end
+end
+~~~
 
-## 2020/07/27
+~~~Matlab windowSpO2.m
+function [SpO2] = windowSpO2(data, SamplingRate, Winsize)
+SamplingTime = Winsize * 60;
+Win = fix(SamplingRate * SamplingTime);
+num = fix(length(data) / Win) - 10;
 
-> Acceleration
+for N = (1:num)
+    SpO2_Arr(:, N) = data(Win * (N - 1) + 1:Win * N);
+end
 
-![Acc](https://user-images.githubusercontent.com/42334717/88665268-58a7c900-d119-11ea-9861-3e05d5f4c587.jpg)
+for N = (1:num)
+    SpO2(N) = mean(SpO2_Arr(:, N));
+end
+end
+~~~
 
-> Acoustic Emission
+~~~Matlab freqHRVCI.m
+function [F] = freqHRVCI(f, P)
+for N = (1:length(f(1,:)))
+[f1, f2, f3] = freqHRVanalysis(f(:, N), P(:, N));
+F(N, 1) = f1;
+F(N, 2) = f2;
+F(N, 3) = f3;
+end
+end
+~~~
 
-![AE](https://user-images.githubusercontent.com/42334717/88665261-56de0580-d119-11ea-86b5-31a9b10bb816.jpg)
+~~~Matlab makeTableofHRV.m
+function [tab] = makeTableofHRV(tm, data, SamplingRate, Windowsize, Apn)
+[f, p] = windowHRV(tm, data(:, 1), SamplingRate, Windowsize);
+F = freqHRVCI(f, p);
+sp = windowSpO2(data(:, 5), SamplingRate, Windowsize);
 
-> Accerleration & Acoustic Emission
+tab = table(F(:, 1), F(:, 2), F(:, 3), sp');
+tab.Properties.VariableNames{'Var1'} = 'VLF';
+tab.Properties.VariableNames{'Var2'} = 'LF';
+tab.Properties.VariableNames{'Var3'} = 'HF';
+tab.Properties.VariableNames{'Var4'} = 'SpO2';
+end
+~~~
 
-![Acc & AE](https://user-images.githubusercontent.com/42334717/88665402-868d0d80-d119-11ea-8e9f-98daa1f4f6a1.png)
+~~~Matlab makeLabelofHRV.m
+function [tab] = makeLabelofHRV(tm, ecg, SamplingRate, Windowsize, tmApn, Apn)
+init = tmApn(1);
+tm = tm(init:length(tm));
+ecg = ecg(init:length(ecg));
 
-> Accerleration & Acoustic Emission & Scoring Data
+[f, p] = windowHRV(tm, ecg, SamplingRate, Windowsize);
+F = freqHRVCI(f, p);
 
-![20200813_무호흡_진단_알고리즘_발표_H_Oh-3](https://user-images.githubusercontent.com/42334717/90608792-110aed80-e23e-11ea-9887-a03d635c1e58.jpg)
+for N = (1:length(F)) % 78(Normal) / 65(Apnea)
+    apn(N) = mean(Apn(Windowsize * (N - 1) + 1:Windowsize * N));
+end
 
-![20200813_무호흡_진단_알고리즘_발표_H_Oh-4](https://user-images.githubusercontent.com/42334717/90608764-051f2b80-e23e-11ea-9156-8175f6ebb90e.jpg)
+apn = abs(apn - 78) / (78 - 65);
+tab = table(F(:, 1), F(:, 2), F(:, 3), apn');
+tab.Properties.VariableNames{'Var1'} = 'VLF';
+tab.Properties.VariableNames{'Var2'} = 'LF';
+tab.Properties.VariableNames{'Var3'} = 'HF';
+tab.Properties.VariableNames{'Var4'} = 'apn';
+end
+~~~
 
-## 2021/01/06
+~~~Matlab apneaFreqPlot.m
+function [tab] = apneaFreqPlot(paramName, Winsize)
+cd apnea-ecg-database-1.0.0/
+wfdb2mat(paramName);
+[tm, data] = rdmat(append(paramName, 'm'));
+[tmApn, apn] = rdann(paramName, 'apn');
+cd ..
 
-> R-R interval & HRV
+tab = makeLabelofHRV(tm, data, 100, Winsize, tmApn, apn);
 
-![R-R interval & HRV](https://user-images.githubusercontent.com/42334717/103840890-cb0fd280-50d5-11eb-94fa-a6bd83468619.png)
+tim = (1:height(tab))*Winsize;
 
-> Frequency Domain Analysis
 
-![Frequency Domain Analysis](https://user-images.githubusercontent.com/42334717/103643405-fa202a00-4f97-11eb-980f-1bb66f5a9e10.png)
+fig = figure;
+set(fig, 'Position', [0 0 1920 1080])
 
-***
+subplot(3,1,1)
+plot(tim, tab.HF, 'Color', 'black', 'LineWidth', 1.2)
+hold on
+plot(tim(tab.apn == 0), tab.HF(tab.apn == 0), 'Color', 'blue', 'Marker', 'o', 'LineWidth', 2, 'LineStyle', 'none')
+plot(tim(tab.apn > 0), tab.HF(tab.apn > 0), 'Color', 'red', 'Marker', '*', 'LineWidth', 2, 'LineStyle', 'none')
+legend('HF', 'Normal', 'Apnea')
+xlabel('Time(min)')
+ylabel('Amplitude(msec)')
+grid on
+set(gca, 'fontsize', 15)
 
-# Index
+subplot(3,1,2)
+plot(tim, tab.LF, 'Color', 'black', 'LineWidth', 1.2)
+hold on
+plot(tim(tab.apn == 0), tab.LF(tab.apn == 0), 'Color', 'blue', 'Marker', 'o', 'LineWidth', 2, 'LineStyle', 'none')
+plot(tim(tab.apn > 0), tab.LF(tab.apn > 0), 'Color', 'red', 'Marker', '*', 'LineWidth', 2, 'LineStyle', 'none')
+legend('LF', 'Normal', 'Apnea')
+xlabel('Time(min)')
+ylabel('Amplitude(msec)')
+grid on
+set(gca, 'fontsize', 15)
 
-+ Sleep Fragmentation Index(SFI, 수면분절지수)
-  + 수면 분절의 정도를 유추하는 계산식을 통해 산출
-  + 기존에는 폐쇄성 수면무호흡증을 78%의 민감도, 95%의 특이도로 진단
-  + 수면무호흡 및 저호흡과 관련된 신체 움직임의 빈도만 반영
-  + 관련이 없는 움직임도 포함시킴으로써 민감도와 특이도가 낮아짐
-+ Apnea-Hypopnea Index(AHI, 수면무호흡지수)
-  + 수면 시, 호흡의 장애 심각도를 측정하는 지표
-  + 무호흡 및 저호흡의 지속 시간, 혈중 산소 포화도 감소, 뇌파의 변화, 신체적 각성 등을 고려
-+ Heart Rate Variability(HRV, 비침습적인 심박변이도)
-  + 심전도상의 R-R 간격의 변화를 측정하여 얻음
-  + 일반적으로 교감신경과 부교감신경의 영향을 받아 조절되는 것으로 알려짐
+subplot(3,1,3)
+plot(tim, tab.VLF, 'Color', 'black', 'LineWidth', 1.2)
+hold on
+plot(tim(tab.apn == 0), tab.VLF(tab.apn == 0), 'Color', 'blue', 'Marker', 'o', 'LineWidth', 2, 'LineStyle', 'none')
+plot(tim(tab.apn > 0), tab.VLF(tab.apn > 0), 'Color', 'red', 'Marker', '*', 'LineWidth', 2, 'LineStyle', 'none')
+legend('VLF', 'Normal', 'Apnea')
+xlabel('Time(min)')
+ylabel('Amplitude(msec)')
+grid on
+set(gca, 'fontsize', 15)
+
+cd plot/
+saveas(gca, append(paramName, '.bmp'))
+cd ..
+end
+~~~
+
+~~~Matlab makeTrainData.m
+function [tab] = makeTrainData(paramName, Winsize)
+cd apnea-ecg-database-1.0.0/
+wfdb2mat(paramName);
+[tm, data] = rdmat(append(paramName, 'm'));
+[tmApn, apn] = rdann(paramName, 'apn');
+cd ..
+
+tab = makeLabelofHRV(tm, data, 100, Winsize, tmApn, apn);
+
+for N = 1:height(tab)
+    if tab.apn(N) == 0
+        tab.label(N) = "Normal";
+    else
+        tab.label(N) = "Apnea";
+    end
+end
+end
+~~~
