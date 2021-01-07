@@ -69,7 +69,7 @@ mathjax: true
 
 ## Frequency domain analysis
 
-> R-R 간격의 주기적 진동을 주파수와 진폭으로 분해
+> R-R 간격의 주기적 진동을 주파수와 진폭으로 분석
 
 + VLF(Very Low frequency) : 0.003~0.04Hz
 + LF(Low Frequency) : 0.04~0.15Hz
