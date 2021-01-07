@@ -1,6 +1,6 @@
 ---
 title: Development of a Obstructive Sleep Apnea Diagnosis Algorithm Using HRV
-date: 2020-07-14 16:37:45
+date: 2021-01-07 10:30:26
 categories:
 - Research
 - Journal
@@ -11,11 +11,7 @@ tags:
 - Matlab
 - PHM
 - Statistics
-- Arduino
-- C, C++
 - Smart data
-- RaspberryPi
-- Python
 - Sleep apnea
 mathjax: true
 ---
@@ -63,11 +59,21 @@ mathjax: true
 
 ## Time domain analysis
 
+> R-R 간격의 변화(NN interval)를 통계적 분석
 
++ SDNN
++ SDNN index
++ RMSSD
++ pNN50
++ SDANN
 
 ## Frequency domain analysis
 
+> R-R 간격의 주기적 진동을 주파수와 진폭으로 분해
 
++ VLF(Very Low frequency) : 0.003~0.04Hz
++ LF(Low Frequency) : 0.04~0.15Hz
++ HF(High Frequency) : 0.15~0.4Hz
 
 ***
 
@@ -96,6 +102,12 @@ mathjax: true
 ![20200813_무호흡_진단_알고리즘_발표_H_Oh-3](https://user-images.githubusercontent.com/42334717/90608792-110aed80-e23e-11ea-9887-a03d635c1e58.jpg)
 
 ![20200813_무호흡_진단_알고리즘_발표_H_Oh-4](https://user-images.githubusercontent.com/42334717/90608764-051f2b80-e23e-11ea-9156-8175f6ebb90e.jpg)
+
+## 2021/01/06
+
+> Frequency Domain Analysis
+
+![Frequency Domain Analysis](https://user-images.githubusercontent.com/42334717/103643405-fa202a00-4f97-11eb-980f-1bb66f5a9e10.png)
 
 ***
 
