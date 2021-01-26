@@ -54,7 +54,7 @@ end
 
 # GUI for DAQ
 
-## PHM_GUI_test
+## PHM GUI test
 
 > Property로 공구의 상태와 훈련된 모델 지정
 
