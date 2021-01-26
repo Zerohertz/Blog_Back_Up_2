@@ -13,6 +13,8 @@ tags:
 - Python
 - R
 - Sleep apnea
+- Machine Learning
+- Smart data
 mathjax: true
 ---
 # Prototype 1(Arduino, Computer)

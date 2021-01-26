@@ -13,7 +13,7 @@ mathjax: true
 ---
 # CIs?
 
-> Condition Indicator의 약자로써, Feature extraction의 과정이며 Smart data와 동의어로 이해할 수 있다.
+> Condition Indicator의 약자로써, Feature extraction의 과정이며 Smart data와 유사하다.
 
 <!-- More -->
 

@@ -12,7 +12,7 @@ comments: false
 
 # Career
 
-{% gdemo_terminal '2017.03 ~ : Konkuk Univ. Mechanical Engineering;2018.06 ~ 2019.11 : Former undergraduate researcher at MRV Lab.(Medical Robotics and Virtual Reality Laboratory);2019.11 ~ : Undergraduate researcher at SiM Lab.(Smart intelligent Manufacturing system Laboratory)' '150px' 'Career' '300' '$' 'career' 'vim' %}
+{% gdemo_terminal '2017.03 ~ 2021.02 : B.S. in Department of Mechanical Engineering, Konkuk University;ㄴ 2018.06 ~ 2019.11 : Undergraduate Researcher at MRV Lab.(Medical Robotics and Virtual Reality Laboratory);ㄴ 2019.11 ~ 2021.02 : Undergraduate Researcher at SiM Lab.(Smart intelligent Manufacturing system Laboratory);2021.03 ~ : M.S. Candidate in Department of Mechanical Engineering, Konkuk University' '150px' 'Career' '300' '$' 'career' 'vim' %}
 {% endgdemo_terminal %}
 
 ***
