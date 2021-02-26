@@ -1,10 +1,10 @@
 ---
-title: Matlab(4)
+title: MatLAB(4)
 date: 2019-10-16 15:07:36
 categories:
-- Matlab
+- MatLAB
 tags:
-- Matlab
+- MatLAB
 thumbnail: https://user-images.githubusercontent.com/42334717/66021849-f1d07800-e526-11e9-8427-04a7a4e6340b.png
 ---
 # Transfer Function

@@ -1,10 +1,10 @@
 ---
-title: Matlab(12)
+title: MatLAB(12)
 date: 2020-07-17 16:07:02
 categories:
-- Matlab
+- MatLAB
 tags:
-- Matlab
+- MatLAB
 - DNN
 ---
 # 제어문

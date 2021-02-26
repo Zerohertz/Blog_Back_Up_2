@@ -1,13 +1,13 @@
 ---
-title: Exporting CWT-CNN Model to C++ from Matlab
+title: Exporting CWT-CNN Model to C++ from MatLAB
 date: 2021-02-26 13:15:06
 categories:
-- Matlab
+- MatLAB
 tags:
 - Machine Learning
 - DNN
 - Signal Processing
-- Matlab
+- MatLAB
 - PHM
 - Statistics
 - Smart data

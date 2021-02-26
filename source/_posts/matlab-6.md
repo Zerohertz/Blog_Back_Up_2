@@ -1,10 +1,10 @@
 ---
-title: Matlab(6)
+title: MatLAB(6)
 date: 2019-11-13 14:54:38
 categories:
-- Matlab
+- MatLAB
 tags:
-- Matlab
+- MatLAB
 - Simulink
 thumbnail: https://user-images.githubusercontent.com/42334717/68738898-dc249700-062a-11ea-8afc-2dc6aa9dbfdf.jpg
 ---

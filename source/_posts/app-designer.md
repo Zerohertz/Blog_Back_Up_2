@@ -2,12 +2,12 @@
 title: App Designer
 date: 2021-01-20 11:39:36
 categories:
-- Matlab
+- MatLAB
 tags:
 - Machine Learning
 - DNN
 - Signal Processing
-- Matlab
+- MatLAB
 - PHM
 - Statistics
 - Smart data

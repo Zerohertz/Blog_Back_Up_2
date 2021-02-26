@@ -1,10 +1,10 @@
 ---
-title: Matlab(9)
+title: MatLAB(9)
 date: 2019-11-27 14:59:48
 categories:
-- Matlab
+- MatLAB
 tags:
-- Matlab
+- MatLAB
 thumbnail: https://user-images.githubusercontent.com/42334717/69700035-d059ca00-112c-11ea-905e-5f83d38f2006.png
 ---
 # Frequency Response

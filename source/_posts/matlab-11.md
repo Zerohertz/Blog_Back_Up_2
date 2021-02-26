@@ -1,10 +1,10 @@
 ---
-title: Matlab(11)
+title: MatLAB(11)
 date: 2019-12-24 16:09:01
 categories:
-- Matlab
+- MatLAB
 tags:
-- Matlab
+- MatLAB
 - Machine Learning
 thumbnail: https://user-images.githubusercontent.com/42334717/71402682-ddf16980-2670-11ea-974c-1966f6959e6a.png
 ---

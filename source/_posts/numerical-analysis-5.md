@@ -7,7 +7,7 @@ categories:
 tags:
 - Python
 - Numerical analysis
-- Matlab
+- MatLAB
 thumbnail: https://user-images.githubusercontent.com/42334717/49585936-1a3d2380-f9a3-11e8-995a-371b124f9803.png
 
 ---

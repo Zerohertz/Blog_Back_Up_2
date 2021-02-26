@@ -1,10 +1,10 @@
 ---
-title: Matlab(8)
+title: MatLAB(8)
 date: 2019-11-27 14:09:33
 categories:
-- Matlab
+- MatLAB
 tags:
-- Matlab
+- MatLAB
 thumbnail: https://user-images.githubusercontent.com/42334717/69696051-d302f200-1121-11ea-8636-644a8b8a04c6.png
 ---
 # Lead-Lag Compensation

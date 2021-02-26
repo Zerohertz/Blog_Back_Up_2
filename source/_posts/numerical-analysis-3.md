@@ -23,7 +23,7 @@ def newrap(x):
 + N-R Method로 Numerical analysis
 + (a), (b)의 시작점으로 값을 찾는다
 + True relative error를 구한다
-+ Matlab으로 Plot
++ MatLAB으로 Plot
 
 ~~~Python
 def f(x): #f(x)

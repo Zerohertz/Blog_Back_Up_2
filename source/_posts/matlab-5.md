@@ -1,10 +1,10 @@
 ---
-title: Matlab(5)
+title: MatLAB(5)
 date: 2019-11-06 15:00:04
 categories:
-- Matlab
+- MatLAB
 tags:
-- Matlab
+- MatLAB
 - Simulink
 thumbnail: https://user-images.githubusercontent.com/42334717/68272624-95252780-00a7-11ea-9c69-39ae46e2a499.png
 ---

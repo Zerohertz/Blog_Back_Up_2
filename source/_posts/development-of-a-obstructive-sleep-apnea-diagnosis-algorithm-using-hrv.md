@@ -2,12 +2,12 @@
 title: Development of a Obstructive Sleep Apnea Diagnosis Algorithm Using HRV
 date: 2021-01-14 11:28:10
 categories:
-- Matlab
+- MatLAB
 tags:
 - Machine Learning
 - DNN
 - Signal Processing
-- Matlab
+- MatLAB
 - PHM
 - Statistics
 - Smart data

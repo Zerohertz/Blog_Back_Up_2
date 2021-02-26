@@ -1,10 +1,10 @@
 ---
-title: Matlab(3)
+title: MatLAB(3)
 date: 2019-10-02 14:44:52
 categories:
-- Matlab
+- MatLAB
 tags:
-- Matlab
+- MatLAB
 thumbnail: https://user-images.githubusercontent.com/42334717/66022189-16791f80-e528-11e9-9dc8-a75c390a6d12.png
 ---
 # Mass-Spring-Damper System
