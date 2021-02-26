@@ -11,8 +11,6 @@ tags:
 - PHM
 - Statistics
 - Smart data
-- Sleep apnea
-- C, C++
 mathjax: true
 ---
 # Plot Cam on App
