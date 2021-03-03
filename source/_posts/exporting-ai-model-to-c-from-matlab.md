@@ -1,5 +1,5 @@
 ---
-title: Exporting CWT-CNN Model to C++ from MatLAB
+title: Exporting AI Model to C++ from MatLAB
 date: 2021-02-26 13:15:06
 categories:
 - MatLAB
