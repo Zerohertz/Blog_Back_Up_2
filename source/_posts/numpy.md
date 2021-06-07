@@ -206,14 +206,18 @@ b =  [[1.+0.j 2.+0.j 3.+0.j]
 
 # Methods of np.ndarray
 
+## Math Function
+
 ~~~python method_st.py
 import numpy as np
 
 a = np.array([[1, 2, 3], [4, 5, 6]], dtype = np.uint8)
 
-for func in (a.shape, a.min, a.max, a.sum, a.prod, a.std, a.var):
+for func in (a.min, a.max, a.sum, a.prod, a.std, a.var):
     print(func.__name__, "=", func())
 ~~~
+
+> `axis = n`과 같이 축을 설정하여 계산 가능
 
 ~~~python Result
 min = 1
@@ -223,3 +227,39 @@ prod = 720
 std = 1.707825127659933
 var = 2.9166666666666665
 ~~~
+
+## Universal Function
+
+~~~python method_un.py
+import numpy as np
+
+a = np.array([[1, 2, 3], [4, 5, 6]], dtype = np.uint8)
+
+for func in (np.square, np.abs, np.sqrt, np.exp, np.log, np.sign, np.ceil, np.modf, np.isnan, np.cos):
+    print(func.__name__, "=", func(a))
+~~~
+
+~~~python Result
+square = [[ 1  4  9]
+ [16 25 36]]
+absolute = [[1 2 3]
+ [4 5 6]]
+sqrt = [[1.    1.414 1.732]
+ [2.    2.236 2.45 ]]
+exp = [[  2.719   7.39   20.08 ]
+ [ 54.6   148.4   403.5  ]]
+log = [[0.     0.6934 1.099 ]
+ [1.387  1.609  1.792 ]]
+sign = [[1 1 1]
+ [1 1 1]]
+ceil = [[1. 2. 3.]
+ [4. 5. 6.]]
+modf = (array([[0., 0., 0.],
+       [0., 0., 0.]], dtype=float16), array([[1., 2., 3.],
+       [4., 5., 6.]], dtype=float16))
+isnan = [[False False False]
+ [False False False]]
+cos = [[ 0.5405 -0.4163 -0.99  ]
+ [-0.654   0.2837  0.96  ]]
+ ~~~
+ 
